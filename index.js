@@ -16,27 +16,33 @@ app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 
 
-
-var asyncopps=(webresponse,i)=>{
-	//asyncc used is the callback from above step.
+var asynccnormalops=(type,name,asyncc)=>{
+	
 	async.waterfall([
-(asyncc)=>{//sfdc handshake
-	restcall.apihandshake(i.sfdcdetails,asyncc); // code at restcaller.js
-},(asyncc)=>{//seggregate opps
-	switch (i.obj.type){
+	(asynccnormal)=>{//seggregate opps
+	//console.log('i val is '+i.obj);
+	switch (type){
 	case "DataRaptor":
-					dr.drapi(i.obj.name,asyncc);// DR code dr.js
+					dr.drapi(name,asynccnormal);// DR code dr.js
 					break;
 
 	}
 },
-(temp1,asyncc)=>{
+(temp2,asynccnormal)=>{
+	var temp1={};
+	//console.log('results  '+temp2[0]+ '     '+temp2[1]);
+	temp1[temp2[0]]=temp2[1];
+	asynccnormal(null,temp1);
+},
+(temp1,asynccnormal)=>{
 	temp1["error"]=[];
 	temp1["warning"]=[];
 	var recurobjs=(objs)=>{
 	for (k in objs){
 		if(objs.hasOwnProperty(k)){
-			if(typeof(objs[k])=="Object"){
+			//console.log(k , typeof(objs[k]));
+			if(typeof(objs[k])=="object" && k!="error" && k!="warning"){
+				console.log('ins obj',k);
 				if(objs[k].hasOwnProperty("error")){
 					temp1["error"].push.apply(temp1["error"], objs[k]["error"]);
 				}
@@ -49,9 +55,23 @@ var asyncopps=(webresponse,i)=>{
 	}
 	};
 	recurobjs(temp1);
-	asyncc(null,temp1);
+	asynccnormal(null,temp1);
 },
+	],(err,res)=>{
+	asyncc(null,err?err:res);
 
+});
+
+};
+
+var asyncopps=(webresponse,i)=>{
+	//asyncc used is the callback from above step.
+	async.waterfall([
+(asyncc)=>{//sfdc handshake
+	restcall.apihandshake(i.sfdcdetails,asyncc); // code at restcaller.js
+},(asyncc)=>{//seggregate opps
+	asynccnormalops(i.obj.type,i.obj.name,asyncc);
+},
 ],(err,res)=>{
 	webresponse.setHeader('Access-Control-Allow-Origin', '*');
 	webresponse.json(err?err:res);

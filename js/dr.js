@@ -1,6 +1,9 @@
 
 var restcall=restcall || require('./restcaller'),
-genericfunctions = genericfunctions || require('./genericfunctions');
+genericfunctions = genericfunctions || require('./genericfunctions'),
+async=async || require('async');
+
+
 var drapi=(name,asyncc)=>{
 	var temp={"type":"","success":[],"error":[],"warning":[]};
 async.waterfall([
@@ -13,6 +16,7 @@ restcall.restcallmapperapi("select+Id,vlocity_cmt__Type__c,vlocity_cmt__OutputTy
 	}
 	else{
 		// DR Naming Convention Start
+		//console.log("naming + "+genericfunctions.namingconventioncheckapi(name)+ "   "+name);
 		if(genericfunctions.namingconventioncheckapi(name)){//Checking Naming Convention
 		temp["success"].push("Naming Convention for "+name+" is followed");
 		}
@@ -27,7 +31,7 @@ restcall.restcallmapperapi("select+Id,vlocity_cmt__Type__c,vlocity_cmt__OutputTy
 		case "Extract":
 		case "Extract (JSON)":
 						//Sample Input JSON DR Preview Start
-						if(isEmpty(JSON.parse(dt.data.records[0]['vlocity_cmt__SampleInputJSON__c']))){
+						if(genericfunctions.isEmpty(JSON.parse(dt.data.records[0]['vlocity_cmt__SampleInputJSON__c']))){
 							temp["error"].push("Sample Input JSON for "+name+" is NULL,Execute DR preview atleast once for valid value");
 						}
 						else{
@@ -102,7 +106,7 @@ restcall.restcallmapperapi("select+Id,vlocity_cmt__Type__c,vlocity_cmt__OutputTy
 											if(lis[i]['vlocity_cmt__FilterOperator__c'] ===null && lis[i]['vlocity_cmt__DomainObjectFieldAPIName__c']!=="Formula"){
 												//console.log(lis[i]["vlocity_cmt__InterfaceFieldAPIName__c"],lis[i]);
 												try{
-												console.log(lis[i]["vlocity_cmt__InterfaceFieldAPIName__c"],lis[i]);
+												//console.log(lis[i]["vlocity_cmt__InterfaceFieldAPIName__c"],lis[i]);
 												var extracrtdrtemp=lis[i]["vlocity_cmt__InterfaceFieldAPIName__c"].lastIndexOf(":");
 												if (extracrtdrtemp!==-1){
 												a=holder[lis[i]["vlocity_cmt__InterfaceFieldAPIName__c"].substring(0,extracrtdrtemp)];
@@ -122,22 +126,24 @@ restcall.restcallmapperapi("select+Id,vlocity_cmt__Type__c,vlocity_cmt__OutputTy
 												}
 											}
 										}
-								console.log(sample,holder);
+								//console.log(sample,holder);
 								 for (i in sample){
-									//console.log('fdf',i);
+									console.log('fdf',i);
 									if(sample.hasOwnProperty(i)){
 										console.log('select+'+sample[i]+'+from+'+i+'+LIMIT+1');
-									q.push('select+'+sample[i]+'+from+'+i+'+LIMIT+1');
+										if(q.indexOf('select+'+sample[i]+'+from+'+i+'+LIMIT+1')==-1){
+										q.push('select+'+sample[i]+'+from+'+i+'+LIMIT+1');}
 									//RestCallMapper(tempquery,'DRqueries',null,client);
 									}
 								}
 								//Execute REST Call for each Start
-								async.map(q, (val,childcallback)=>{//WIP
-									restcall.restcallmapperapi(val,childcallback);
-								}, (err,result)=>{
+								//async.map(q, (val,childcallback)=>{//WIP
+									//restcall.restcallmapperapi(val,childcallback);
+								//}, (err,result)=>{
 									// i want result of each call
-								});
+								//});
 								// Execute REST Call for Each End
+								drapic(null,null);
 							// Extract DR Perform Operations End
 					}
 					break;

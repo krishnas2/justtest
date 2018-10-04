@@ -7,7 +7,7 @@ instance_url='',
 squery='/services/data/v42.0/query/?q=';
 
 var apihandshake= (data,asyncc)=>{
-	         console.log('sfdc',data);
+	         //console.log('sfdc',data);
 		   console.log('came here1');
 	var headers={
 		'Content-Type':'application/json'
@@ -21,7 +21,7 @@ var apihandshake= (data,asyncc)=>{
 	};
 	var host=data.env=="Production"?'login.salesforce.com':'test.salesforce.com',
 	endpoint = '/services/oauth2/token?'+querystring.stringify(dat);
-	console.log(dat['client_id'],dat['username'],dat['password']);
+	//console.log(dat['client_id'],dat['username'],dat['password']);
 	var options={
 		host:host,
 		port:null,
@@ -38,7 +38,7 @@ var apihandshake= (data,asyncc)=>{
 		});
 		res.on('end',function(){
 			try{
-			console.log('rstring',responseString);
+			//console.log('rstring',responseString);
 			var responseObject=JSON.parse(responseString);
 			access_token=responseObject.token_type+' '+responseObject.access_token;
 			instance_url=responseObject.instance_url.split('/')[2];
@@ -85,7 +85,7 @@ var restcallmapperapi=(query,callback)=>{
 		});
 		result.on('end',function(){
 			var resp=JSON.parse(responseString1);
-			console.log('respo',resp.done,resp.totalSize,resp);
+			//console.log('respo',resp.done,resp.totalSize,resp);
 			if(resp.done && resp.totalSize>0){
 				temp["data"]=resp;
 			}
@@ -104,3 +104,5 @@ var restcallmapperapi=(query,callback)=>{
 
 module.exports.apihandshake=apihandshake;
 module.exports.restcallmapperapi=restcallmapperapi;
+module.exports.access_token=access_token;
+module.exports.instance_url=instance_url;
