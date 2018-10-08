@@ -5,7 +5,36 @@ username='',
 access_token='',
 instance_url='',
 squery='/services/data/v42.0/query/?q=';
+const rp = require('request-promise');
+async function getData(array) {
+    let results = [];
+    var headers= {
+        'Content-Type':'application/json',
+        'Authorization':access_token
+    };
 
+    for (let item of array) {
+        let newOptions={
+            port:null,
+			url:'https://'+instance_url+squery+item,
+            method:'GET',
+            headers:headers
+        };
+
+        let data = await rp(newOptions).then(r=>{
+			
+			console.log(r);
+			return null;
+		}).catch(e => {
+			//console.log(e.message);
+            return e.message;
+            // if error, make data be null and continue processing
+            //return null;
+        });
+        results.push(data);
+    }
+    return results;
+}
 var apihandshake= (data,asyncc)=>{
 	         //console.log('sfdc',data);
 		   console.log('came here1');
@@ -106,3 +135,4 @@ module.exports.apihandshake=apihandshake;
 module.exports.restcallmapperapi=restcallmapperapi;
 module.exports.access_token=access_token;
 module.exports.instance_url=instance_url;
+module.exports.getData=getData;

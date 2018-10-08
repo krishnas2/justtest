@@ -143,17 +143,37 @@ restcall.restcallmapperapi("select+Id,vlocity_cmt__Type__c,vlocity_cmt__OutputTy
 									// i want result of each call
 								//});
 								// Execute REST Call for Each End
-								drapic(null,null);
+								//q.push('select+Idddd,Nameee+from+Account+LIMIT+1');
+								//q.push('select+kkj+from+Contact+LIMIT+1');
+								restcall.getData(q).then(allData => {
+									// allData is array of results
+									allData.map(item => {
+										if(item){
+											console.log(item);
+											temp["error"].push(item);
+										}
+										
+										//temp["error"].push(item);
+										//temp["error"].push.apply(temp["error"], item)
+									});
+									drapic(null,null);
+								}).catch(err => {
+									temp["error"].push(err);
+									drapic(null,null);
+								});
 							// Extract DR Perform Operations End
 					}
 					break;
-		case "Load":break;
+		case "Load":drapic(null,null);
+						break;
 	}
+	
 }
 }
 ],(err,res)=>{
 	if(err){
 		temp["error"].push(err);}
+		//temp["error"].push('some test');
 	asyncc(null,[name,temp]);
 });
 };
